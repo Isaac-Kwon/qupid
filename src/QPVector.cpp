@@ -1,7 +1,7 @@
 #include "QPVector.hpp"
 #include "QPMath.hpp"
 
-#include "math.h"
+#include <cmath>
 
 #include <iostream>
 #include <string>
