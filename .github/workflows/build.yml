@@ -1,0 +1,77 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  standalone:
+    # ROOT-free toolchain. Covers the core build and the graceful
+    # "ROOT requested but not installed" configure path.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build core without ROOT (QUPID_WITH_ROOT=OFF)
+        run: |
+          cmake -S . -B build-off -DCMAKE_BUILD_TYPE=Release -DQUPID_WITH_ROOT=OFF
+          cmake --build build-off -j"$(nproc)"
+      - name: Run core tests
+        working-directory: build-off
+        run: |
+          ./test0_VectorMatrix
+          ./test3_digitizer
+      - name: Build with ROOT requested but absent (QUPID_WITH_ROOT=ON)
+        # ROOT is not present on this runner; the default-ON configure must
+        # still succeed by skipping the visualization module.
+        run: |
+          cmake -S . -B build-on -DCMAKE_BUILD_TYPE=Release -DQUPID_WITH_ROOT=ON
+          cmake --build build-on -j"$(nproc)"
+
+  full:
+    # Full build with ROOT available: all tests plus the test6 regression check.
+    runs-on: ubuntu-latest
+    container: rootproject/root:6.36.00-ubuntu25.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure and build (ROOT visualization enabled)
+        run: |
+          if [ -n "$ROOTSYS" ] && [ -f "$ROOTSYS/bin/thisroot.sh" ]; then . "$ROOTSYS/bin/thisroot.sh"; fi
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j"$(nproc)"
+      - name: Run tests
+        working-directory: build
+        # No DISPLAY in the container; the compiled ROOT executables fall back
+        # to batch mode, and the dump macro below runs with root -b.
+        run: |
+          if [ -n "$ROOTSYS" ] && [ -f "$ROOTSYS/bin/thisroot.sh" ]; then . "$ROOTSYS/bin/thisroot.sh"; fi
+          for t in test0_VectorMatrix test1_spanGaussian test2_gaussianSignal test3_digitizer test4_graphfactory test5_puremontecarlo1; do
+            echo "=== $t ==="
+            ./"$t"
+          done
+      - name: test6 regression against baseline
+        working-directory: build
+        run: |
+          if [ -n "$ROOTSYS" ] && [ -f "$ROOTSYS/bin/thisroot.sh" ]; then . "$ROOTSYS/bin/thisroot.sh"; fi
+          ./test6_puremontecarlo2
+          root -b -q -l "$GITHUB_WORKSPACE/macro/dump_test6.C"
+          cut -f4 test6_dump.tsv | sort -n | uniq -c > npix_dist.txt
+          echo "npix distribution:"
+          cat npix_dist.txt
+          REF="$GITHUB_WORKSPACE/test/baseline/test6_npix_ref.txt"
+          if [ -f "$REF" ]; then
+            echo "Comparing against $REF"
+            diff "$REF" npix_dist.txt
+          else
+            echo "Baseline $REF not present; skipping regression comparison"
+          fi
+      - name: Upload npix distribution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test6-npix-dist
+          path: build/npix_dist.txt
