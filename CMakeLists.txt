@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(qupid)
+project(qupid VERSION 0.2)
 
 #find_package(Sanitizers)
 
