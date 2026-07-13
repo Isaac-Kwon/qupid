@@ -122,5 +122,6 @@ endif()
 
 add_subdirectory(exe)
 add_subdirectory(test)
+add_subdirectory(tutorials)
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Data)
