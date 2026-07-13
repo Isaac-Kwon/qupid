@@ -16,14 +16,20 @@
   
     TString libIncludePath = TString::Format("%sinclude", DirName.Data());
     TString libLoadPath = TString::Format("%s%s", DirName.Data(), libFilename.Data());
+    TString libVisLoadPath = TString::Format("%slibqupidVis", DirName.Data());
 
     gInterpreter->AddIncludePath(libIncludePath);
     gInterpreter->Load(libLoadPath, true);
     // gInterpreter->Load(libLoadPath, false);
     gSystem->Load(libLoadPath);
-    
+
+    // optional visualization module (present only for ROOT-enabled builds)
+    gInterpreter->Load(libVisLoadPath, true);
+    gSystem->Load(libVisLoadPath);
+
     std::cout<<"Include Path: " <<libIncludePath<<std::endl;
     std::cout<<"Library Path: " <<libLoadPath<<std::endl;
+    std::cout<<"Vis Library Path: " <<libVisLoadPath<<std::endl;
 
     std::cout<<std::endl;
 
