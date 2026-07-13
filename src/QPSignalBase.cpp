@@ -1,6 +1,6 @@
 #include "QPGeneral.hpp"
 #include "QPSignalBase.hpp"
-#include "iostream"
+#include <iostream>
 
 QPSignalBase::QPSignalBase(const double& amplitude): fAmplitude(amplitude){
     ;
