@@ -44,8 +44,6 @@ void test2_gaussianSignal(){
             t->SetTextSize(10);
             t->SetTextAngle(0);
             t->Draw();
-
-
         }
     }
     h1->GetZaxis()->SetRangeUser(0.1, h1->GetBinContent(h1->GetMaximumBin()));
@@ -53,8 +51,6 @@ void test2_gaussianSignal(){
     c1->Update();
     std::cout<<h1->Integral()<<std::endl;
     c1->SetLogz();
-    
-
 
 }
 
