@@ -3,6 +3,8 @@
 #include "QPMatrix.hpp"
 #include "QPDigitizerSquare.hpp"
 #include "QPSignalGaussian.hpp"
+#include "QPMonteCarlo.hpp"
+#include "QPRandomTRandom.hpp"
 
 #include "TRandom3.h"
 #include "TTree.h"
@@ -50,8 +52,9 @@ void test5_puremontecarlo1(){
     tree->SetAlias("keV", "amp*3.6/1000");
     tree->SetAlias("MeV", "amp*3.6/1000000");
 
-    // Define Random Generator
+    // Define Random Generator (TRandom3 through the core RNG interface)
     TRandom3* rand = new TRandom3();
+    QPRandomTRandom qprandom(rand);
 
     // Variable
     // * Signal position X and Y
@@ -62,27 +65,27 @@ void test5_puremontecarlo1(){
     // * Amplitude
     // * Sigma
 
+    // Define Monte Carlo driver (draw order per event: x, y; amp is fixed)
+    QPMonteCarlo mc(dig, qprandom);
+    mc.SetPositionRange(-pitchx*0.5, pitchx*0.5, -pitchy*0.5, pitchy*0.5);
+    mc.SetAmplitude(amp);
+    mc.SetSigma(sigma);
+    mc.SetThreshold(threshold);
+
     int pin = nTrial/100;
 
     for(int i=0; i<nTrial; i++){
-        pos.x = rand->Uniform(-pitchx*0.5, pitchx*0.5);
-        pos.y = rand->Uniform(-pitchy*0.5, pitchy*0.5);
-
-        QPVector mu = QPVector(pos.x, pos.y);
-        QPMatrix S  = QPMatrix(2,2,4, sigma, 0., 0., sigma);
-
-        QPSignalGaussian  * sig = new QPSignalGaussian(mu, amp, S);
-        dig->InjectSignal(sig);
-
-        npix = dig->GetFiredPixel(threshold).size();
+        QPMonteCarlo::Record rec = mc.Shoot();
+        pos.x = rec.fX;
+        pos.y = rec.fY;
+        npix  = rec.fNpix;
 
         tree->Fill();
-        dig->ClearSignal();
-        
+
         if( i%pin == 0){
             std::cout<<"i = "<<i<<std::endl;
         }
-    }    
+    }
 
     TH1D* h1 = new TH1D("h1", "h1", 49, 1, 50);
     tree->Draw("npix>>h1", "", "goff");
