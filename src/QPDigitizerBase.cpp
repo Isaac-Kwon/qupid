@@ -1,7 +1,7 @@
 #include "QPDigitizerBase.hpp"
 #include "QPSignalBase.hpp"
 #include "QPPixelBase.hpp"
-#include "iostream"
+#include <iostream>
 
 QPDigitizerBase::QPDigitizerBase(int npix): fNpix0(npix){;}
 
@@ -22,12 +22,12 @@ QPPixelBase* QPDigitizerBase::GetPixel(const int i, const int j){
     return nullptr;
 }
 
-QPSignalBase* QPDigitizerBase::GetSignal(int i){
-    if(fSignals.size() < i) return nullptr;
+QPSignalBase* QPDigitizerBase::GetSignal(int i) const{
+    if(i < 0 || i >= GetNSignal()) return nullptr;
     return fSignals.at(i);
 }
 
-int QPDigitizerBase::GetNSignal(){
+int QPDigitizerBase::GetNSignal() const{
     return fSignals.size();
 }
 
