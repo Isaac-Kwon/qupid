@@ -1,0 +1,43 @@
+name: docs
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; a newer push cancels an in-progress run.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Doxygen (+ Graphviz for diagrams, LaTeX for \f$ formulas)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz \
+            texlive-base texlive-latex-extra texlive-fonts-recommended dvipng ghostscript
+      - name: Build documentation
+        # run from the repo root: relative paths in doc/Doxyfile resolve against the CWD
+        run: doxygen doc/Doxyfile
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: doc/doxygen/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
