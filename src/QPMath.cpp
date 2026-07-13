@@ -4,8 +4,8 @@
 #include "QPVector.hpp"
 #include "QPMatrix.hpp"
 
-#include "math.h"
-#include "iostream"
+#include <cmath>
+#include <iostream>
 
 double QPMath::Gaussian::Simple1D(double x,
                                   double integral,
@@ -229,7 +229,7 @@ double QPMath::Gaus(const double& x, const double& mean, const double& sigma, co
 }
 
 
-QPMatrix& QPMath::RotationMatrix(double theta){
+QPMatrix QPMath::RotationMatrix(double theta){
     QPMatrix ans = QPMatrix(2,2,4,QPMath::Cos(theta), -QPMath::Sin(theta), QPMath::Sin(theta), QPMath::Cos(theta));
     return ans;
 }
