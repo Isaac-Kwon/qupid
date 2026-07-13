@@ -2,7 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-[![DOI](https://zenodo.org/badge/408895120.svg)](https://zenodo.org/badge/latestdoi/408895120)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5519750.svg)](https://doi.org/10.5281/zenodo.5519750)
 
 **Qu**asi-Signal Generation Model for **Pi**xelized **D**etector.
 
