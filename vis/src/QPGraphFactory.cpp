@@ -105,13 +105,5 @@ void QPGraphFactory::DrawDigitalSignalText(TH2D* h){
 }
 
 void QPGraphFactory::DrawPixelLinse(TH2D* h){
-    int binx = GetDigitizer()->GetNPixelX();
-    int biny = GetDigitizer()->GetNPixelX();
-    double pitx = GetDigitizer()->GetSizeX() / (binx);
-    double pity = GetDigitizer()->GetSizeY() / (biny);
-    double offsetx = -(GetDigitizer()->GetSizeX())*0.5 + pitx*0.5;
-    double offsety = -(GetDigitizer()->GetSizeY())*0.5 + pity*0.5;
-
-
-
+    // Not yet implemented.
 }
