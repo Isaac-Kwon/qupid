@@ -1,7 +1,8 @@
-#include "iostream"
-#include "stdlib.h"
-#include "stdarg.h"
-#include "sstream"
+#include <iostream>
+#include <cstdlib>
+#include <cstdarg>
+#include <cmath>
+#include <sstream>
 
 #include "QPMatrix.hpp"
 
